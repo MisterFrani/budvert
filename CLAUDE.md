@@ -133,3 +133,11 @@ src/
 2. Pour chaque feature : crée les types DB → l'api Supabase → les hooks → les composants → la route.
 3. Avant de committer mentalement une étape, vérifie : TypeScript ok ? RLS testée ? Responsive ok ?
 4. Si un choix d'archi se présente, propose-moi 2 options brèves avant de coder.
+
+## Conventions multi-budget
+
+- Toute requête vers une table liée à un budget (categories, transactions, savings_goals, debts, alerts) DOIT inclure budgetId dans la queryKey TanStack Query
+- Pattern : queryKey: ['categories', budgetId] — jamais ['categories'] seul
+- Le budget actif est UNIQUEMENT lu via useActiveBudget(), jamais via une prop ou un context dédié
+- Si une page a besoin du budgetId, elle l'obtient via useActiveBudget(), pas via useParams ou autre
+- Les invalidations TanStack après mutation sont CIBLÉES sur le budget concerné : queryClient.invalidateQueries({ queryKey: ['transactions', budgetId] })

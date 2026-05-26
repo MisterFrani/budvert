@@ -2,6 +2,7 @@ import { ArrowLeftRight, LayoutDashboard, Settings, Users, Wallet } from 'lucide
 import { NavLink, Outlet } from 'react-router-dom'
 
 import { UserMenu } from '@/features/auth/components/UserMenu'
+import { BudgetSwitcher } from '@/features/budgets/components/BudgetSwitcher'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -15,10 +16,13 @@ const navItems = [
 export default function MobileLayout() {
   return (
     <div className="flex h-screen flex-col bg-[#fafafa] dark:bg-[#0a0a0a]">
-      <header className="flex h-14 items-center justify-between border-b border-[#e5e5e5] bg-white px-4 dark:border-[#262626] dark:bg-[#171717]">
-        <span className="text-base font-semibold tracking-tight">budvert</span>
-        <div className="w-48">
+      <header className="border-b border-[#e5e5e5] bg-white dark:border-[#262626] dark:bg-[#171717]">
+        <div className="flex h-14 items-center justify-between px-4">
+          <span className="text-base font-semibold tracking-tight">budvert</span>
           <UserMenu />
+        </div>
+        <div className="px-4 pb-3">
+          <BudgetSwitcher />
         </div>
       </header>
 

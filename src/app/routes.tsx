@@ -9,6 +9,7 @@ import AuthCallbackPage from '@/features/auth/pages/AuthCallbackPage'
 import LoginPage from '@/features/auth/pages/LoginPage'
 import SignupPage from '@/features/auth/pages/SignupPage'
 import OnboardingPage from '@/features/onboarding/pages/OnboardingPage'
+import SettingsPage from '@/features/settings/pages/SettingsPage'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 
 function AppLayout() {
@@ -52,7 +53,7 @@ const router = createBrowserRouter([
           { path: '/partage', element: <ComingSoon page="Partage" /> },
           { path: '/dettes', element: <ComingSoon page="Dettes" /> },
           { path: '/epargne', element: <ComingSoon page="Épargne" /> },
-          { path: '/parametres', element: <ComingSoon page="Paramètres" /> },
+          { path: '/parametres', element: <SettingsPage /> },
         ],
       },
     ],

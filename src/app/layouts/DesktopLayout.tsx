@@ -10,6 +10,7 @@ import {
 import { NavLink, Outlet } from 'react-router-dom'
 
 import { UserMenu } from '@/features/auth/components/UserMenu'
+import { BudgetSwitcher } from '@/features/budgets/components/BudgetSwitcher'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -27,6 +28,10 @@ export default function DesktopLayout() {
       <aside className="flex w-[240px] flex-col border-r border-[#e5e5e5] bg-white dark:border-[#262626] dark:bg-[#171717]">
         <div className="flex h-14 items-center border-b border-[#e5e5e5] px-6 dark:border-[#262626]">
           <span className="text-lg font-semibold tracking-tight">budvert</span>
+        </div>
+
+        <div className="p-3 pb-0">
+          <BudgetSwitcher />
         </div>
 
         <nav className="flex-1 space-y-0.5 p-3">
