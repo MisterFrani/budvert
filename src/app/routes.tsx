@@ -2,6 +2,13 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import DesktopLayout from '@/app/layouts/DesktopLayout'
 import MobileLayout from '@/app/layouts/MobileLayout'
+import OnboardingRoute from '@/app/routes/OnboardingRoute'
+import ProtectedRoute from '@/app/routes/ProtectedRoute'
+import PublicRoute from '@/app/routes/PublicRoute'
+import AuthCallbackPage from '@/features/auth/pages/AuthCallbackPage'
+import LoginPage from '@/features/auth/pages/LoginPage'
+import SignupPage from '@/features/auth/pages/SignupPage'
+import OnboardingPage from '@/features/onboarding/pages/OnboardingPage'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 
 function AppLayout() {
@@ -19,19 +26,35 @@ function ComingSoon({ page }: { page: string }) {
 
 const router = createBrowserRouter([
   {
-    path: '/login',
-    element: <ComingSoon page="Login" />,
+    element: <PublicRoute />,
+    children: [
+      { path: '/login', element: <LoginPage /> },
+      { path: '/signup', element: <SignupPage /> },
+    ],
   },
   {
-    element: <AppLayout />,
+    path: '/auth/callback',
+    element: <AuthCallbackPage />,
+  },
+  {
+    element: <OnboardingRoute />,
+    children: [{ path: '/onboarding', element: <OnboardingPage /> }],
+  },
+  {
+    element: <ProtectedRoute />,
     children: [
-      { path: '/', element: <ComingSoon page="Dashboard" /> },
-      { path: '/transactions', element: <ComingSoon page="Transactions" /> },
-      { path: '/budget', element: <ComingSoon page="Budget" /> },
-      { path: '/partage', element: <ComingSoon page="Partage" /> },
-      { path: '/dettes', element: <ComingSoon page="Dettes" /> },
-      { path: '/epargne', element: <ComingSoon page="Épargne" /> },
-      { path: '/parametres', element: <ComingSoon page="Paramètres" /> },
+      {
+        element: <AppLayout />,
+        children: [
+          { path: '/', element: <ComingSoon page="Dashboard" /> },
+          { path: '/transactions', element: <ComingSoon page="Transactions" /> },
+          { path: '/budget', element: <ComingSoon page="Budget" /> },
+          { path: '/partage', element: <ComingSoon page="Partage" /> },
+          { path: '/dettes', element: <ComingSoon page="Dettes" /> },
+          { path: '/epargne', element: <ComingSoon page="Épargne" /> },
+          { path: '/parametres', element: <ComingSoon page="Paramètres" /> },
+        ],
+      },
     ],
   },
 ])

@@ -4,7 +4,7 @@
 
 Application web de gestion de budget personnel et partagé. Stack stable et minimaliste, esthétique Apple/Linear (sobre, beaucoup de blanc, ombres très subtiles, typographie soignée).
 
-non de l'application web budvert
+non de l'application web budgvert
 
 ## Stack technique (à respecter strictement)
 

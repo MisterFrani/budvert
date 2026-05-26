@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 
+import { UserMenu } from '@/features/auth/components/UserMenu'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -49,7 +50,8 @@ export default function DesktopLayout() {
           ))}
         </nav>
 
-        <div className="border-t border-[#e5e5e5] p-3 dark:border-[#262626]">
+        <div className="border-t border-[#e5e5e5] p-3 dark:border-[#262626] space-y-0.5">
+          <UserMenu />
           <NavLink
             to="/parametres"
             className={({ isActive }) =>
