@@ -1,0 +1,41 @@
+import { ArrowLeftRight, LayoutDashboard, Settings, Users, Wallet } from 'lucide-react'
+import { NavLink, Outlet } from 'react-router-dom'
+
+import { cn } from '@/lib/utils'
+
+const navItems = [
+  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
+  { to: '/budget', icon: Wallet, label: 'Budget' },
+  { to: '/partage', icon: Users, label: 'Partage' },
+  { to: '/parametres', icon: Settings, label: 'Paramètres' },
+]
+
+export default function MobileLayout() {
+  return (
+    <div className="flex h-screen flex-col bg-[#fafafa] dark:bg-[#0a0a0a]">
+      <main className="flex-1 overflow-auto pb-16">
+        <Outlet />
+      </main>
+
+      <nav className="fixed bottom-0 left-0 right-0 flex h-16 items-center border-t border-[#e5e5e5] bg-white px-2 dark:border-[#262626] dark:bg-[#171717]">
+        {navItems.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === '/'}
+            className={({ isActive }) =>
+              cn(
+                'flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium transition-colors',
+                isActive ? 'text-[#6366f1]' : 'text-[#a3a3a3]',
+              )
+            }
+          >
+            <Icon className="h-5 w-5" />
+            {label}
+          </NavLink>
+        ))}
+      </nav>
+    </div>
+  )
+}

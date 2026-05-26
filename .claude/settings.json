@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(mkdir -p '/Users/franibizi/Documents/SIDE PROJECT/budvert/src/features/__TRACKED_VAR__/components' '/Users/franibizi/Documents/SIDE PROJECT/budvert/src/features/__TRACKED_VAR__/hooks')",
+      "Bash(touch '/Users/franibizi/Documents/SIDE PROJECT/budvert/src/features/__TRACKED_VAR__/components/.gitkeep' '/Users/franibizi/Documents/SIDE PROJECT/budvert/src/features/__TRACKED_VAR__/hooks/.gitkeep')"
+    ]
+  }
+}
