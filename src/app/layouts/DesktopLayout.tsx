@@ -7,8 +7,10 @@ import {
   Users,
   Wallet,
 } from 'lucide-react'
+import { useContext } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 
+import { RightPanelContext, RightPanelProvider } from '@/app/layouts/RightPanelContext'
 import { UserMenu } from '@/features/auth/components/UserMenu'
 import { BudgetSwitcher } from '@/features/budgets/components/BudgetSwitcher'
 import { cn } from '@/lib/utils'
@@ -22,7 +24,9 @@ const navItems = [
   { to: '/epargne', icon: PiggyBank, label: 'Épargne' },
 ]
 
-export default function DesktopLayout() {
+function LayoutInner() {
+  const { content } = useContext(RightPanelContext)
+
   return (
     <div className="flex h-screen bg-[#fafafa] dark:bg-[#0a0a0a]">
       <aside className="flex w-[240px] flex-col border-r border-[#e5e5e5] bg-white dark:border-[#262626] dark:bg-[#171717]">
@@ -55,7 +59,7 @@ export default function DesktopLayout() {
           ))}
         </nav>
 
-        <div className="border-t border-[#e5e5e5] p-3 dark:border-[#262626] space-y-0.5">
+        <div className="space-y-0.5 border-t border-[#e5e5e5] p-3 dark:border-[#262626]">
           <UserMenu />
           <NavLink
             to="/parametres"
@@ -78,7 +82,17 @@ export default function DesktopLayout() {
         <Outlet />
       </main>
 
-      <aside className="w-[320px] shrink-0 border-l border-[#e5e5e5] bg-white dark:border-[#262626] dark:bg-[#171717]" />
+      <aside className="w-[320px] shrink-0 border-l border-[#e5e5e5] bg-white dark:border-[#262626] dark:bg-[#171717]">
+        {content}
+      </aside>
     </div>
+  )
+}
+
+export default function DesktopLayout() {
+  return (
+    <RightPanelProvider>
+      <LayoutInner />
+    </RightPanelProvider>
   )
 }

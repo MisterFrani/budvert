@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { fetchCategoriesByBudget } from '@/features/categories/api'
+import { listCategories } from '@/features/categories/api'
+import { STALE_TIME } from '@/lib/constants'
 
-export function useCategories(budgetId: string) {
+export function useCategories(budgetId: string | null | undefined) {
   return useQuery({
     queryKey: ['categories', budgetId],
-    queryFn: () => fetchCategoriesByBudget(budgetId),
+    queryFn: () => listCategories(budgetId!),
     enabled: !!budgetId,
-    staleTime: 30_000,
+    staleTime: STALE_TIME,
   })
 }

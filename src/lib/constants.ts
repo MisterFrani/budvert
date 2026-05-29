@@ -1,13 +1,23 @@
 import type { LucideIcon } from 'lucide-react'
 import {
+  Baby,
+  BookOpen,
+  Briefcase,
   Car,
+  Coffee,
+  Dumbbell,
   Gamepad2,
+  Gift,
   Heart,
   Home,
+  Music,
   Package,
+  Phone,
+  Plane,
   Scissors,
   ShoppingCart,
   Tv,
+  UtensilsCrossed,
   Wifi,
   Zap,
 } from 'lucide-react'
@@ -67,8 +77,59 @@ export const CATEGORY_ICON_MAP: Record<string, LucideIcon> = {
   package: Package,
   divers: Package,
   other: Package,
+  utensils: UtensilsCrossed,
+  restaurant: UtensilsCrossed,
+  coffee: Coffee,
+  cafe: Coffee,
+  plane: Plane,
+  voyage: Plane,
+  'book-open': BookOpen,
+  livres: BookOpen,
+  music: Music,
+  musique: Music,
+  briefcase: Briefcase,
+  travail: Briefcase,
+  gift: Gift,
+  cadeaux: Gift,
+  phone: Phone,
+  telephone: Phone,
+  baby: Baby,
+  enfants: Baby,
+  dumbbell: Dumbbell,
+  sport: Dumbbell,
 }
+
+export const SELECTABLE_ICONS = [
+  'home',
+  'shopping-cart',
+  'car',
+  'tv',
+  'heart',
+  'gamepad-2',
+  'scissors',
+  'zap',
+  'wifi',
+  'package',
+  'utensils',
+  'coffee',
+  'plane',
+  'book-open',
+  'music',
+  'briefcase',
+  'gift',
+  'phone',
+  'baby',
+  'dumbbell',
+] as const
+
+export type SelectableIcon = (typeof SELECTABLE_ICONS)[number]
 
 export function getCategoryIcon(iconName: string): LucideIcon {
   return CATEGORY_ICON_MAP[iconName.toLowerCase()] ?? Package
+}
+
+export function getProgressColor(percentage: number): string {
+  if (percentage < BUDGET_THRESHOLDS.WARNING) return PROGRESS_COLORS.SAFE
+  if (percentage < BUDGET_THRESHOLDS.DANGER) return PROGRESS_COLORS.WARNING
+  return PROGRESS_COLORS.DANGER
 }
