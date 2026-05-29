@@ -1,4 +1,5 @@
 import { CheckCircle2, RefreshCw } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -6,6 +7,7 @@ import { useAlerts } from '@/features/alerts/hooks/useAlerts'
 import { useMarkAlertsRead } from '@/features/alerts/hooks/useMarkAlertsRead'
 import { useSavingsGoals } from '@/features/savings/hooks/useSavingsGoals'
 import { useTransactions } from '@/features/transactions/hooks/useTransactions'
+import { getCategoryIcon } from '@/lib/constants'
 import { formatCurrency } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -18,6 +20,16 @@ export function RightPanelContent({ budgetId }: Props) {
   const { data: recurring } = useTransactions(budgetId, { type: 'recurring' })
 
   const unread = alerts?.filter((a) => !a.is_read) ?? []
+
+  const topGoals = goals
+    ? [...goals]
+        .sort((a, b) => {
+          const pctA = a.target_amount > 0 ? (a.current_amount ?? 0) / a.target_amount : 0
+          const pctB = b.target_amount > 0 ? (b.current_amount ?? 0) / b.target_amount : 0
+          return pctB - pctA
+        })
+        .slice(0, 3)
+    : []
 
   return (
     <div className="flex flex-col gap-6 overflow-auto p-5">
@@ -94,19 +106,35 @@ export function RightPanelContent({ budgetId }: Props) {
 
       {/* Objectifs épargne */}
       <section>
-        <p className="mb-3 text-sm font-medium">Objectifs épargne</p>
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-sm font-medium">Objectifs épargne</p>
+          {goals && goals.length > 0 && (
+            <Link to="/epargne" className="text-xs text-indigo-500 hover:underline">
+              Voir tout
+            </Link>
+          )}
+        </div>
         {!goals || goals.length === 0 ? (
-          <p className="text-xs text-neutral-400">Aucun objectif</p>
+          <div className="flex flex-col items-start gap-1">
+            <p className="text-xs text-neutral-400">Aucun objectif</p>
+            <Link to="/epargne" className="text-xs text-indigo-500 hover:underline">
+              Créer un objectif
+            </Link>
+          </div>
         ) : (
           <div className="space-y-3">
-            {goals.slice(0, 3).map((goal) => {
+            {topGoals.map((goal) => {
               const pct = goal.target_amount > 0
                 ? Math.min(((goal.current_amount ?? 0) / goal.target_amount) * 100, 100)
                 : 0
+              const Icon = getCategoryIcon(goal.icon ?? 'piggy-bank')
               return (
                 <div key={goal.id}>
-                  <div className="mb-1 flex justify-between">
-                    <span className="text-xs font-medium">{goal.name}</span>
+                  <div className="mb-1 flex items-center gap-2">
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30">
+                      <Icon className="h-3 w-3 text-indigo-600" />
+                    </div>
+                    <span className="flex-1 truncate text-xs font-medium">{goal.name}</span>
                     <span className="text-xs text-neutral-400">{Math.round(pct)}%</span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-neutral-100">

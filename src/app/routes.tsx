@@ -10,7 +10,9 @@ import LoginPage from '@/features/auth/pages/LoginPage'
 import SignupPage from '@/features/auth/pages/SignupPage'
 import BudgetPage from '@/features/budget/pages/BudgetPage'
 import DashboardPage from '@/features/dashboard/pages/DashboardPage'
+import DebtsPage from '@/features/debts/pages/DebtsPage'
 import OnboardingPage from '@/features/onboarding/pages/OnboardingPage'
+import SavingsPage from '@/features/savings/pages/SavingsPage'
 import SettingsPage from '@/features/settings/pages/SettingsPage'
 import TransactionsPage from '@/features/transactions/pages/TransactionsPage'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
@@ -54,8 +56,8 @@ const router = createBrowserRouter([
           { path: '/transactions', element: <TransactionsPage /> },
           { path: '/budget', element: <BudgetPage /> },
           { path: '/partage', element: <ComingSoon page="Partage" /> },
-          { path: '/dettes', element: <ComingSoon page="Dettes" /> },
-          { path: '/epargne', element: <ComingSoon page="Épargne" /> },
+          { path: '/dettes', element: <DebtsPage /> },
+          { path: '/epargne', element: <SavingsPage /> },
           { path: '/parametres', element: <SettingsPage /> },
         ],
       },

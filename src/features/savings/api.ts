@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import type { TablesInsert, TablesUpdate } from '@/types/database'
 
 export async function listSavingsGoals(budgetId: string) {
   const { data, error } = await supabase
@@ -9,4 +10,63 @@ export async function listSavingsGoals(budgetId: string) {
 
   if (error) throw new Error(error.message)
   return data
+}
+
+export async function createSavingsGoal(
+  budgetId: string,
+  payload: Omit<TablesInsert<'savings_goals'>, 'budget_id'>,
+) {
+  const { data, error } = await supabase
+    .from('savings_goals')
+    .insert({ ...payload, budget_id: budgetId })
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data
+}
+
+export async function updateSavingsGoal(id: string, payload: TablesUpdate<'savings_goals'>) {
+  const { data, error } = await supabase
+    .from('savings_goals')
+    .update(payload)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data
+}
+
+export async function deleteSavingsGoal(id: string) {
+  const { error } = await supabase.from('savings_goals').delete().eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export async function addContribution(
+  goalId: string,
+  amount: number,
+  note?: string,
+  date?: string,
+) {
+  const { error: contribError } = await supabase.from('savings_contributions').insert({
+    goal_id: goalId,
+    amount,
+    note: note ?? null,
+    date: date ?? new Date().toISOString().split('T')[0],
+  })
+  if (contribError) throw new Error(contribError.message)
+
+  const { data: goal, error: fetchError } = await supabase
+    .from('savings_goals')
+    .select('current_amount')
+    .eq('id', goalId)
+    .single()
+  if (fetchError) throw new Error(fetchError.message)
+
+  const { error: updateError } = await supabase
+    .from('savings_goals')
+    .update({ current_amount: (goal.current_amount ?? 0) + amount })
+    .eq('id', goalId)
+  if (updateError) throw new Error(updateError.message)
 }
