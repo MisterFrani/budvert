@@ -117,7 +117,7 @@ function InviteForm({ budgetId, compact = false }: InviteFormProps) {
                 'h-7 w-7 rounded-full transition-transform',
                 color === c.value ? 'ring-2 ring-offset-2 scale-110' : 'opacity-70 hover:opacity-100',
               )}
-              style={{ backgroundColor: c.value, ringColor: c.value }}
+              style={{ backgroundColor: c.value }}
             />
           ))}
         </div>
