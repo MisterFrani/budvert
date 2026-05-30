@@ -6,7 +6,8 @@
       "Bash(touch '/Users/franibizi/Documents/SIDE PROJECT/budvert/src/features/__TRACKED_VAR__/components/.gitkeep' '/Users/franibizi/Documents/SIDE PROJECT/budvert/src/features/__TRACKED_VAR__/hooks/.gitkeep')",
       "Bash(npx eslint *)",
       "Bash(npx shadcn *)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(node -e ' *)"
     ]
   }
 }

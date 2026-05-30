@@ -1,6 +1,8 @@
 import { RefreshCw } from 'lucide-react'
 
+import { BrandIcon } from '@/components/shared/BrandIcon'
 import { getCategoryIcon } from '@/lib/constants'
+import { matchBrand } from '@/lib/brand-icons'
 import { formatCurrency, formatDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { Tables } from '@/types/database'
@@ -17,21 +19,27 @@ type TransactionRowProps = {
 export function TransactionRow({ transaction, category, onClick }: TransactionRowProps) {
   const Icon = getCategoryIcon(category?.icon ?? '')
   const isIncome = transaction.type === 'income'
+  const hasBrand = matchBrand(transaction.description) !== null
 
   return (
     <button
+      type="button"
       className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-[#1a1a1a]"
       onClick={() => onClick?.(transaction)}
     >
-      <div
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-        style={{ backgroundColor: category ? `${category.color}20` : '#f5f5f5' }}
-      >
-        <Icon
-          className="h-4 w-4"
-          style={{ color: category?.color ?? '#737373' }}
-        />
-      </div>
+      {hasBrand ? (
+        <BrandIcon name={transaction.description} size={18} />
+      ) : (
+        <div
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+          style={{ backgroundColor: category ? `${category.color}20` : '#f5f5f5' }}
+        >
+          <Icon
+            className="h-4 w-4"
+            style={{ color: category?.color ?? '#737373' }}
+          />
+        </div>
+      )}
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
