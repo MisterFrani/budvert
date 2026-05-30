@@ -6,6 +6,7 @@ export const transactionSchema = z.object({
   description: z.string().min(1, 'Description requise'),
   date: z.string().min(1, 'Date requise'),
   category_id: z.string().optional(),
+  member_id: z.string().nullable().optional(),
   notes: z.string().optional(),
   is_recurring: z.boolean().default(false),
   recurrence_rule: z.enum(['monthly', 'weekly']).optional(),

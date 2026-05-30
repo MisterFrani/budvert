@@ -1,0 +1,30 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    - cron: '0 9 */5 * *'
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        run: |
+          RESPONSE=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/health_check" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=minimal" \
+            -d '{"source":"github_action"}')
+
+          echo "HTTP Status: $RESPONSE"
+          cat /tmp/response.json
+
+          if [ "$RESPONSE" -ne 201 ] && [ "$RESPONSE" -ne 200 ]; then
+            echo "Ping failed with status $RESPONSE"
+            exit 1
+          fi
+
+          echo "Supabase pinged successfully at $(date)"

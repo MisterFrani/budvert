@@ -11,6 +11,7 @@ import SignupPage from '@/features/auth/pages/SignupPage'
 import BudgetPage from '@/features/budget/pages/BudgetPage'
 import DashboardPage from '@/features/dashboard/pages/DashboardPage'
 import DebtsPage from '@/features/debts/pages/DebtsPage'
+import SharePage from '@/features/members/pages/SharePage'
 import OnboardingPage from '@/features/onboarding/pages/OnboardingPage'
 import SavingsPage from '@/features/savings/pages/SavingsPage'
 import SettingsPage from '@/features/settings/pages/SettingsPage'
@@ -22,13 +23,6 @@ function AppLayout() {
   return isDesktop ? <DesktopLayout /> : <MobileLayout />
 }
 
-function ComingSoon({ page }: { page: string }) {
-  return (
-    <div className="flex h-full min-h-[60vh] items-center justify-center">
-      <p className="text-sm text-muted-foreground">{page} — Bientôt disponible</p>
-    </div>
-  )
-}
 
 const router = createBrowserRouter([
   {
@@ -55,7 +49,7 @@ const router = createBrowserRouter([
           { path: '/', element: <DashboardPage /> },
           { path: '/transactions', element: <TransactionsPage /> },
           { path: '/budget', element: <BudgetPage /> },
-          { path: '/partage', element: <ComingSoon page="Partage" /> },
+          { path: '/partage', element: <SharePage /> },
           { path: '/dettes', element: <DebtsPage /> },
           { path: '/epargne', element: <SavingsPage /> },
           { path: '/parametres', element: <SettingsPage /> },

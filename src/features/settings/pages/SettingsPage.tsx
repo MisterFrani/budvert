@@ -12,6 +12,7 @@ import { useUserBudgets } from '@/features/budgets/hooks/useUserBudgets'
 import { AddCategoryDialog } from '@/features/categories/components/AddCategoryDialog'
 import { EditCategoryDialog } from '@/features/categories/components/EditCategoryDialog'
 import { useCategories } from '@/features/categories/hooks/useCategories'
+import { DataSettings } from '@/features/settings/components/DataSettings'
 import { getCategoryIcon } from '@/lib/constants'
 import type { Tables } from '@/types/database'
 
@@ -54,6 +55,7 @@ export default function SettingsPage() {
           <TabsTrigger value="budgets">Budgets</TabsTrigger>
           <TabsTrigger value="charges">Charges</TabsTrigger>
           <TabsTrigger value="theme">Thème</TabsTrigger>
+          <TabsTrigger value="donnees">Données</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profil">
@@ -146,6 +148,10 @@ export default function SettingsPage() {
 
         <TabsContent value="theme">
           <ComingSoonTab />
+        </TabsContent>
+
+        <TabsContent value="donnees">
+          <DataSettings />
         </TabsContent>
       </Tabs>
 

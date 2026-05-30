@@ -25,6 +25,7 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { useActiveBudget } from '@/features/budgets/hooks/useActiveBudget'
 import { useCategories } from '@/features/categories/hooks/useCategories'
+import { useMembers } from '@/features/members/hooks/useMembers'
 import { useCreateTransaction } from '@/features/transactions/hooks/useCreateTransaction'
 import { useDeleteTransaction } from '@/features/transactions/hooks/useDeleteTransaction'
 import { useUpdateTransaction } from '@/features/transactions/hooks/useUpdateTransaction'
@@ -46,6 +47,8 @@ export function TransactionSheet({ open, onOpenChange, transaction }: Props) {
   const { user } = useAuthStore()
   const { activeBudgetId } = useActiveBudget()
   const { data: categories } = useCategories(activeBudgetId)
+  const { data: members } = useMembers(activeBudgetId)
+  const activeMembers = members?.filter((m) => m.status === 'active') ?? []
 
   const createTransaction = useCreateTransaction(activeBudgetId ?? '')
   const updateTransaction = useUpdateTransaction(activeBudgetId ?? '')
@@ -72,6 +75,7 @@ export function TransactionSheet({ open, onOpenChange, transaction }: Props) {
           description: transaction.description,
           date: transaction.date,
           category_id: transaction.category_id ?? undefined,
+          member_id: transaction.member_id ?? null,
           notes: transaction.notes ?? undefined,
           is_recurring: transaction.is_recurring ?? false,
           recurrence_rule: transaction.recurrence_rule as 'monthly' | 'weekly' | undefined,
@@ -96,6 +100,7 @@ export function TransactionSheet({ open, onOpenChange, transaction }: Props) {
       description: data.description,
       date: data.date,
       category_id: data.category_id ?? null,
+      member_id: data.member_id ?? null,
       notes: data.notes ?? null,
       is_recurring: data.is_recurring,
       recurrence_rule: data.is_recurring ? (data.recurrence_rule ?? 'monthly') : null,
@@ -194,6 +199,34 @@ export function TransactionSheet({ open, onOpenChange, transaction }: Props) {
               )}
             />
           </div>
+
+          {activeMembers.length > 0 && (
+            <div className="space-y-1.5">
+              <Label>Attribué à</Label>
+              <Controller
+                name="member_id"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value ?? ''}
+                    onValueChange={(v) => field.onChange(v === '__none__' ? null : v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Non attribué" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">Non attribué</SelectItem>
+                      {activeMembers.map((m) => (
+                        <SelectItem key={m.id} value={m.user_id ?? m.id}>
+                          {m.display_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+          )}
 
           <div className="space-y-1.5">
             <Label>Note (optionnel)</Label>
