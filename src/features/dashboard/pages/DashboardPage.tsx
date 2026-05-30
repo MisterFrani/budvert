@@ -2,6 +2,7 @@ import { endOfMonth, format, isSameMonth, startOfMonth, subMonths } from 'date-f
 import { fr } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import type { Tables } from '@/types/database'
 
 import { useRightPanel } from '@/app/layouts/RightPanelContext'
 import { useCurrentProfile } from '@/features/auth/hooks/useCurrentProfile'
@@ -17,6 +18,7 @@ import { StatsGrid } from '@/features/dashboard/components/StatsGrid'
 import { useBudgetSummary } from '@/features/dashboard/hooks/useBudgetSummary'
 import { useDebts } from '@/features/debts/hooks/useDebts'
 import { useSavingsGoals } from '@/features/savings/hooks/useSavingsGoals'
+import { TransactionSheet } from '@/features/transactions/components/TransactionSheet'
 import { useTransactions } from '@/features/transactions/hooks/useTransactions'
 import { cn } from '@/lib/utils'
 
@@ -27,6 +29,8 @@ export default function DashboardPage() {
   const setRightPanel = useRightPanel()
 
   const [displayMonth, setDisplayMonth] = useState(new Date())
+  const [editTarget, setEditTarget] = useState<Tables<'transactions'> | undefined>()
+  const [sheetOpen, setSheetOpen] = useState(false)
   const today = new Date()
   const isCurrentMonth = isSameMonth(displayMonth, today)
 
@@ -137,6 +141,13 @@ export default function DashboardPage() {
         transactions={currentMonthTx}
         categories={categories}
         isLoading={txPending}
+        onEdit={(t) => { setEditTarget(t); setSheetOpen(true) }}
+      />
+
+      <TransactionSheet
+        open={sheetOpen}
+        onOpenChange={(o) => { setSheetOpen(o); if (!o) setEditTarget(undefined) }}
+        transaction={editTarget}
       />
     </div>
   )

@@ -36,7 +36,7 @@ export function CreateBudgetDialog({ open, onOpenChange }: CreateBudgetDialogPro
     formState: { errors, isSubmitting },
   } = useForm<CreateBudgetData>({
     resolver: zodResolver(createBudgetSchema),
-    defaultValues: { name: '', color: BUDGET_COLORS[0] },
+    defaultValues: { name: '', color: BUDGET_COLORS[0], overdraft_limit: 0 },
   })
 
   useEffect(() => {
@@ -49,6 +49,7 @@ export function CreateBudgetDialog({ open, onOpenChange }: CreateBudgetDialogPro
       name: data.name,
       type: data.type,
       color: data.color,
+      overdraft_limit: data.overdraft_limit ?? 0,
       owner_id: user.id,
     })
     onOpenChange(false)

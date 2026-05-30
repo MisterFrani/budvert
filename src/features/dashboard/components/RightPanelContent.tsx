@@ -1,12 +1,18 @@
-import { CheckCircle2, PiggyBank, RefreshCw } from 'lucide-react'
+import { CheckCircle2, Pencil, PiggyBank, RefreshCw } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
+import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAlerts } from '@/features/alerts/hooks/useAlerts'
 import { useMarkAlertsRead } from '@/features/alerts/hooks/useMarkAlertsRead'
+import { EditBudgetDialog } from '@/features/budgets/components/EditBudgetDialog'
+import { useActiveBudget } from '@/features/budgets/hooks/useActiveBudget'
+import { OverdraftMeter } from '@/features/dashboard/components/OverdraftMeter'
+import { useBudgetSummary } from '@/features/dashboard/hooks/useBudgetSummary'
 import { useSavingsGoals } from '@/features/savings/hooks/useSavingsGoals'
 import { useTransactions } from '@/features/transactions/hooks/useTransactions'
 import { formatCurrency } from '@/lib/format'
@@ -19,6 +25,9 @@ export function RightPanelContent({ budgetId }: Props) {
   const markRead = useMarkAlertsRead(budgetId)
   const { data: goals } = useSavingsGoals(budgetId)
   const { data: recurring } = useTransactions(budgetId, { type: 'recurring' })
+  const { data: summary } = useBudgetSummary(budgetId, new Date())
+  const { budget } = useActiveBudget()
+  const [editOpen, setEditOpen] = useState(false)
 
   const unread = alerts?.filter((a) => !a.is_read) ?? []
 
@@ -112,6 +121,61 @@ export function RightPanelContent({ budgetId }: Props) {
 
       <Separator className="my-3" />
 
+      {/* Découvert — toujours visible */}
+      <section>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">Découvert autorisé</p>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-6 gap-1 px-2 text-[11px] text-indigo-600 hover:text-indigo-700"
+            onClick={() => setEditOpen(true)}
+          >
+            <Pencil className="h-3 w-3" />
+            Modifier
+          </Button>
+        </div>
+
+        {!summary ? (
+          <Skeleton className="h-8 rounded-lg" />
+        ) : summary.overdraftLimit === 0 ? (
+          /* Pas d'autorisation configurée */
+          <div className="rounded-lg border border-dashed border-neutral-200 bg-neutral-50 px-3 py-2.5 dark:border-[#333] dark:bg-[#1a1a1a]">
+            <p className="text-xs text-neutral-500">Aucune autorisation configurée</p>
+            <button
+              type="button"
+              onClick={() => setEditOpen(true)}
+              className="mt-0.5 text-[11px] font-medium text-indigo-600 hover:underline"
+            >
+              + Définir une limite de découvert
+            </button>
+          </div>
+        ) : summary.balanceZone === 'positive' ? (
+          /* Limite configurée, solde positif */
+          <div className="space-y-1">
+            <div className="flex items-center justify-between rounded-lg bg-neutral-50 px-3 py-2 dark:bg-[#1a1a1a]">
+              <span className="text-xs text-neutral-500">Autorisé jusqu'à</span>
+              <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-200">
+                -{formatCurrency(summary.overdraftLimit)}
+              </span>
+            </div>
+            <p className="px-1 text-[10px] text-neutral-400">Aucun découvert utilisé ce mois</p>
+          </div>
+        ) : (
+          /* En découvert ou dépassé */
+          <OverdraftMeter
+            available={summary.available}
+            overdraftLimit={summary.overdraftLimit}
+            overdraftUsed={summary.overdraftUsed}
+            balanceZone={summary.balanceZone}
+            compact
+          />
+        )}
+      </section>
+
+      <Separator className="my-3" />
+
       {/* Objectifs épargne */}
       <section>
         <div className="mb-2 flex items-center justify-between">
@@ -154,6 +218,14 @@ export function RightPanelContent({ budgetId }: Props) {
           </div>
         )}
       </section>
+
+      {budget && (
+        <EditBudgetDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          budget={budget}
+        />
+      )}
     </div>
   )
 }

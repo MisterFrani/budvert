@@ -12,9 +12,10 @@ type Props = {
   transactions: Transaction[] | undefined
   categories: Category[] | undefined
   isLoading: boolean
+  onEdit?: (t: Transaction) => void
 }
 
-export function RecentTransactions({ transactions, categories, isLoading }: Props) {
+export function RecentTransactions({ transactions, categories, isLoading, onEdit }: Props) {
   const categoryMap = useMemo(() => {
     const map = new Map<string, Category>()
     categories?.forEach((c) => map.set(c.id, c))
@@ -52,6 +53,7 @@ export function RecentTransactions({ transactions, categories, isLoading }: Prop
               key={t.id}
               transaction={t}
               category={t.category_id ? categoryMap.get(t.category_id) : undefined}
+              onClick={onEdit}
             />
           ))
         )}

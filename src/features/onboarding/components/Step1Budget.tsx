@@ -24,7 +24,7 @@ export function Step1Budget({ onComplete }: Step1Props) {
     formState: { errors, isSubmitting },
   } = useForm<CreateBudgetData>({
     resolver: zodResolver(createBudgetSchema),
-    defaultValues: { name: 'Budget Personnel', color: BUDGET_COLORS[0] },
+    defaultValues: { name: 'Budget Personnel', color: BUDGET_COLORS[0], overdraft_limit: 0 },
   })
 
   async function onSubmit(data: CreateBudgetData) {
@@ -34,6 +34,7 @@ export function Step1Budget({ onComplete }: Step1Props) {
         name: data.name,
         type: data.type,
         color: data.color,
+        overdraft_limit: data.overdraft_limit ?? 0,
         owner_id: user.id,
       })
       onComplete(budget.id)

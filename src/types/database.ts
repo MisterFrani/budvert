@@ -137,6 +137,7 @@ export type Database = {
           id: string
           monthly_income: number | null
           name: string
+          overdraft_limit: number
           owner_id: string
           type: string
           updated_at: string | null
@@ -148,6 +149,7 @@ export type Database = {
           id?: string
           monthly_income?: number | null
           name: string
+          overdraft_limit?: number
           owner_id: string
           type: string
           updated_at?: string | null
@@ -159,6 +161,7 @@ export type Database = {
           id?: string
           monthly_income?: number | null
           name?: string
+          overdraft_limit?: number
           owner_id?: string
           type?: string
           updated_at?: string | null

@@ -4,6 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { STALE_TIME } from '@/lib/constants'
 
+export type BalanceZone = 'positive' | 'overdraft' | 'exceeded'
+
 export type BudgetSummary = {
   carriedOver: number
   monthIncome: number
@@ -14,13 +16,24 @@ export type BudgetSummary = {
   debtPaidThisMonth: number
   debtRemaining: number
   reallyFree: number
+  overdraftLimit: number
+  overdraftUsed: number
+  overdraftRemaining: number
+  balanceZone: BalanceZone
 }
 
-async function fetchSummary(budgetId: string, monthDate: Date): Promise<BudgetSummary> {
+export function computeBalanceZone(available: number, overdraftLimit: number): BalanceZone {
+  if (available >= 0) return 'positive'
+  if (overdraftLimit <= 0) return 'exceeded'
+  if (available >= -overdraftLimit) return 'overdraft'
+  return 'exceeded'
+}
+
+export async function fetchSummary(budgetId: string, monthDate: Date): Promise<BudgetSummary> {
   const monthStart = format(startOfMonth(monthDate), 'yyyy-MM-dd')
   const monthEnd = format(endOfMonth(monthDate), 'yyyy-MM-dd')
 
-  const [carriedOverRes, totalsRes, debtsRes] = await Promise.all([
+  const [carriedOverRes, totalsRes, debtsRes, budgetRes] = await Promise.all([
     supabase.rpc('get_carried_over', { p_budget_id: budgetId, p_before: monthStart }),
     supabase.rpc('get_month_totals', {
       p_budget_id: budgetId,
@@ -31,6 +44,11 @@ async function fetchSummary(budgetId: string, monthDate: Date): Promise<BudgetSu
       .from('debts')
       .select('id, monthly_payment, paid_amount, total_amount')
       .eq('budget_id', budgetId),
+    supabase
+      .from('budgets')
+      .select('overdraft_limit')
+      .eq('id', budgetId)
+      .single(),
   ])
 
   if (carriedOverRes.error) throw new Error(carriedOverRes.error.message)
@@ -41,6 +59,7 @@ async function fetchSummary(budgetId: string, monthDate: Date): Promise<BudgetSu
   const totalsRow = (totalsRes.data as { income: number; expenses: number }[] | null)?.[0]
   const monthIncome = Number(totalsRow?.income) || 0
   const monthExpenses = Number(totalsRow?.expenses) || 0
+  const overdraftLimit = Number(budgetRes.data?.overdraft_limit) || 0
 
   const debts = debtsRes.data ?? []
   const debtIds = debts.map((d) => d.id)
@@ -84,6 +103,10 @@ async function fetchSummary(budgetId: string, monthDate: Date): Promise<BudgetSu
   const debtRemaining = Math.max(0, debtDueThisMonth - debtPaidThisMonth)
   const available = carriedOver + monthIncome - monthExpenses
 
+  const overdraftUsed = available < 0 ? Math.abs(available) : 0
+  const overdraftRemaining = overdraftLimit - overdraftUsed
+  const balanceZone = computeBalanceZone(available, overdraftLimit)
+
   return {
     carriedOver,
     monthIncome,
@@ -94,6 +117,10 @@ async function fetchSummary(budgetId: string, monthDate: Date): Promise<BudgetSu
     debtPaidThisMonth,
     debtRemaining,
     reallyFree: available - debtRemaining,
+    overdraftLimit,
+    overdraftUsed,
+    overdraftRemaining,
+    balanceZone,
   }
 }
 

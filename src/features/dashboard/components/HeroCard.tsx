@@ -4,6 +4,7 @@ import { ArrowDownToLine, CreditCard, PiggyBank } from 'lucide-react'
 
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { OverdraftMeter } from '@/features/dashboard/components/OverdraftMeter'
 import type { BudgetSummary } from '@/features/dashboard/hooks/useBudgetSummary'
 import { formatCurrency } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -43,9 +44,17 @@ export function HeroCard({ firstName, displayMonth, summary, isLoading }: Props)
   const debtDueThisMonth = summary?.debtDueThisMonth ?? 0
   const debtPaidThisMonth = summary?.debtPaidThisMonth ?? 0
   const reallyFree = summary?.reallyFree ?? 0
-
-  const isPositive = available >= 0
+  const overdraftLimit = summary?.overdraftLimit ?? 0
+  const overdraftUsed = summary?.overdraftUsed ?? 0
+  const balanceZone = summary?.balanceZone ?? 'positive'
   const isFreePositive = reallyFree >= 0
+
+  const balanceColor =
+    balanceZone === 'positive'
+      ? 'text-emerald-600'
+      : balanceZone === 'overdraft'
+        ? 'text-amber-600'
+        : 'text-red-600'
 
   return (
     <div className="space-y-4 rounded-2xl border border-neutral-100 bg-gradient-to-br from-indigo-50 to-white p-6 dark:border-[#262626] dark:from-[#1a1a2e] dark:to-[#171717]">
@@ -60,9 +69,20 @@ export function HeroCard({ firstName, displayMonth, summary, isLoading }: Props)
       {/* Solde disponible */}
       <div>
         <p className="mb-0.5 text-xs text-neutral-500">Solde disponible</p>
-        <p className={cn('text-4xl font-bold', isPositive ? 'text-neutral-900 dark:text-white' : 'text-red-500')}>
+        <p className={cn('text-4xl font-bold', balanceColor)}>
           {formatCurrency(available)}
         </p>
+
+        {balanceZone !== 'positive' && (
+          <div className="mt-3">
+            <OverdraftMeter
+              available={available}
+              overdraftLimit={overdraftLimit}
+              overdraftUsed={overdraftUsed}
+              balanceZone={balanceZone}
+            />
+          </div>
+        )}
       </div>
 
       {/* Détail inline */}

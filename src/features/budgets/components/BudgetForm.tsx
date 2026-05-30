@@ -80,6 +80,22 @@ export function BudgetFormFields({ register, watch, setValue, errors }: BudgetFo
         </div>
         {errors.color && <p className="text-sm text-red-500">{errors.color.message}</p>}
       </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="overdraft-limit">Autorisation de découvert (€)</Label>
+        <Input
+          id="overdraft-limit"
+          type="number"
+          min={0}
+          step={1}
+          placeholder="0"
+          {...register('overdraft_limit', { valueAsNumber: true })}
+        />
+        {errors.overdraft_limit && <p className="text-sm text-red-500">{errors.overdraft_limit.message}</p>}
+        <p className="text-xs text-neutral-400">
+          Montant jusqu'auquel ton solde peut descendre sans dépassement. 0 = pas de découvert autorisé.
+        </p>
+      </div>
     </>
   )
 }

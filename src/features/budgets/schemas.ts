@@ -10,6 +10,7 @@ export const createBudgetSchema = z.object({
   color: z.string().refine((c) => (BUDGET_COLORS as readonly string[]).includes(c), {
     message: 'Couleur invalide',
   }),
+  overdraft_limit: z.number().min(0, 'Doit être ≥ 0').default(0),
 })
 
 export const updateBudgetSchema = createBudgetSchema.partial()

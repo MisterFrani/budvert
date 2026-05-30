@@ -40,6 +40,7 @@ export function EditBudgetDialog({ open, onOpenChange, budget }: EditBudgetDialo
       name: budget.name,
       type: budget.type as CreateBudgetData['type'],
       color: budget.color,
+      overdraft_limit: budget.overdraft_limit ?? 0,
     },
   })
 
@@ -49,6 +50,7 @@ export function EditBudgetDialog({ open, onOpenChange, budget }: EditBudgetDialo
         name: budget.name,
         type: budget.type as CreateBudgetData['type'],
         color: budget.color,
+        overdraft_limit: budget.overdraft_limit ?? 0,
       })
     }
   }, [open, budget, reset])
