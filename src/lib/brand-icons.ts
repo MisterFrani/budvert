@@ -136,6 +136,51 @@ const BRAND_ENTRIES: Array<{ keys: string[]; entry: BrandEntry }> = [
   { keys: ['betclic', 'winamax', 'unibet', 'pmu', 'fdj', 'française des jeux'], entry: lu(Gamepad2, '#6366F1') },
 ]
 
+type ClearbitEntry = { domain: string; color: string }
+
+const CLEARBIT_DOMAINS: Array<{ keys: string[]; entry: ClearbitEntry }> = [
+  { keys: ['free mobile', 'freemobile', 'free'], entry: { domain: 'free.fr', color: '#CD2028' } },
+  { keys: ['orange'], entry: { domain: 'orange.com', color: '#FF6600' } },
+  { keys: ['sfr'], entry: { domain: 'sfr.fr', color: '#E2001A' } },
+  { keys: ['bouygues', 'b&you', 'byou'], entry: { domain: 'bouyguestelecom.fr', color: '#00A1DE' } },
+  { keys: ['sncf', 'ouigo', 'tgv', 'inoui'], entry: { domain: 'sncf.com', color: '#C0003C' } },
+  { keys: ['ratp', 'navigo'], entry: { domain: 'ratp.fr', color: '#E2231A' } },
+  { keys: ['basic fit', 'basicfit'], entry: { domain: 'basic-fit.com', color: '#E30613' } },
+  { keys: ['fitness park'], entry: { domain: 'fitnesspark.fr', color: '#E30613' } },
+  { keys: ['neoness'], entry: { domain: 'neoness.fr', color: '#000000' } },
+  { keys: ['bodyhit'], entry: { domain: 'bodyhit.fr', color: '#FF6B00' } },
+  { keys: ['sephora'], entry: { domain: 'sephora.fr', color: '#000000' } },
+  { keys: ['fnac'], entry: { domain: 'fnac.com', color: '#E1A925' } },
+  { keys: ['doctolib'], entry: { domain: 'doctolib.fr', color: '#3B5FCA' } },
+  { keys: ['alan'], entry: { domain: 'alan.com', color: '#00D4BE' } },
+  { keys: ['leboncoin'], entry: { domain: 'leboncoin.fr', color: '#F56B2A' } },
+  { keys: ['blablacar', 'bla bla car'], entry: { domain: 'blablacar.fr', color: '#00BFE9' } },
+  { keys: ['bolt'], entry: { domain: 'bolt.eu', color: '#34D186' } },
+  { keys: ['vinted'], entry: { domain: 'vinted.fr', color: '#09B1BA' } },
+  { keys: ['airbnb'], entry: { domain: 'airbnb.com', color: '#FF5A5F' } },
+  { keys: ['edf'], entry: { domain: 'edf.fr', color: '#FF6200' } },
+  { keys: ['engie'], entry: { domain: 'engie.fr', color: '#00AAFF' } },
+  { keys: ['veolia'], entry: { domain: 'veolia.com', color: '#005C8A' } },
+  { keys: ['maif'], entry: { domain: 'maif.fr', color: '#C8102E' } },
+  { keys: ['axa'], entry: { domain: 'axa.fr', color: '#00008F' } },
+  { keys: ['macif'], entry: { domain: 'macif.fr', color: '#E2001A' } },
+  { keys: ['betclic'], entry: { domain: 'betclic.fr', color: '#00A651' } },
+  { keys: ['winamax'], entry: { domain: 'winamax.fr', color: '#FF4000' } },
+  { keys: ['unibet'], entry: { domain: 'unibet.fr', color: '#007B5E' } },
+]
+
+export function matchClearbit(text: string): ClearbitEntry | null {
+  const normalized = text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .trim()
+  for (const { keys, entry } of CLEARBIT_DOMAINS) {
+    if (keys.some((k) => normalized.includes(k))) return entry
+  }
+  return null
+}
+
 export function matchBrand(text: string): BrandEntry | null {
   const normalized = text
     .toLowerCase()

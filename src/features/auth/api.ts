@@ -41,3 +41,15 @@ export async function fetchCurrentProfile(userId: string) {
   if (error) throw new Error(error.message)
   return data
 }
+
+export async function updateProfile(userId: string, updates: { full_name?: string; avatar_color?: string }) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update(updates)
+    .eq('id', userId)
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data
+}

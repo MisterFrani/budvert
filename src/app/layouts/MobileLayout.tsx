@@ -1,4 +1,4 @@
-import { ArrowLeftRight, CreditCard, LayoutDashboard, PiggyBank, Settings, Wallet } from 'lucide-react'
+import { ArrowLeftRight, CreditCard, LayoutDashboard, PiggyBank, Wallet } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 import { UserMenu } from '@/features/auth/components/UserMenu'
@@ -19,17 +19,7 @@ export default function MobileLayout() {
       <header className="border-b border-[#e5e5e5] bg-white dark:border-[#262626] dark:bg-[#171717]">
         <div className="flex h-14 items-center justify-between px-4">
           <span className="text-base font-semibold tracking-tight">budvert</span>
-          <div className="flex items-center gap-2">
-            <NavLink
-              to="/parametres"
-              className={({ isActive }) =>
-                cn('p-1.5 transition-colors', isActive ? 'text-[#6366f1]' : 'text-[#a3a3a3]')
-              }
-            >
-              <Settings className="h-4 w-4" />
-            </NavLink>
-            <UserMenu />
-          </div>
+          <UserMenu side="bottom" align="end" />
         </div>
         <div className="px-4 pb-3">
           <BudgetSwitcher />

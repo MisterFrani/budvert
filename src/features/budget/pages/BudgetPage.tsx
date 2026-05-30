@@ -1,15 +1,17 @@
 import { endOfMonth, format, startOfMonth } from 'date-fns'
-import { Plus } from 'lucide-react'
+import { AlertTriangle, Plus, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useActiveBudget } from '@/features/budgets/hooks/useActiveBudget'
+import { renameLegacyCategories } from '@/features/categories/api'
 import { AddCategoryDialog } from '@/features/categories/components/AddCategoryDialog'
 import { CategoryCard, CategoryCardSkeleton } from '@/features/categories/components/CategoryCard'
 import { EditCategoryDialog } from '@/features/categories/components/EditCategoryDialog'
 import { useCategories } from '@/features/categories/hooks/useCategories'
 import { useTransactions } from '@/features/transactions/hooks/useTransactions'
+import { useQueryClient } from '@tanstack/react-query'
 import type { Tables } from '@/types/database'
 
 type Category = Tables<'categories'>
@@ -21,8 +23,21 @@ export default function BudgetPage() {
   const endDate = format(endOfMonth(new Date()), 'yyyy-MM-dd')
   const { data: transactions } = useTransactions(activeBudgetId, { startDate, endDate })
 
+  const queryClient = useQueryClient()
   const [editTarget, setEditTarget] = useState<Category | null>(null)
   const [addOpen, setAddOpen] = useState(false)
+  const [bannerDismissed, setBannerDismissed] = useState(false)
+
+  const hasLegacyNames = !bannerDismissed && (
+    categories?.some((c) => c.name === 'Alimentation' || c.name === 'Loisirs') ?? false
+  )
+
+  async function handleRenameDefaults() {
+    if (!activeBudgetId) return
+    await renameLegacyCategories(activeBudgetId)
+    queryClient.invalidateQueries({ queryKey: ['categories', activeBudgetId] })
+    setBannerDismissed(true)
+  }
 
   const spentByCategory = useMemo(() => {
     const map = new Map<string, number>()
@@ -50,6 +65,20 @@ export default function BudgetPage() {
 
   return (
     <div className="p-6 space-y-8">
+      {hasLegacyNames && (
+        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/10">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />
+          <span className="flex-1 text-sm text-amber-700 dark:text-amber-400">
+            Tes catégories utilisent les anciens noms.
+            <button type="button" className="ml-1 underline" onClick={handleRenameDefaults}>
+              Mettre à jour vers les nouveaux noms
+            </button>
+          </span>
+          <button type="button" aria-label="Fermer" onClick={() => setBannerDismissed(true)}>
+            <X className="h-3.5 w-3.5 text-amber-400" />
+          </button>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Budget</h1>
         <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setAddOpen(true)}>

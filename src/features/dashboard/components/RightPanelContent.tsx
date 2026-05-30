@@ -1,13 +1,14 @@
-import { CheckCircle2, RefreshCw } from 'lucide-react'
+import { CheckCircle2, PiggyBank, RefreshCw } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { formatDistanceToNow } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
-import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAlerts } from '@/features/alerts/hooks/useAlerts'
 import { useMarkAlertsRead } from '@/features/alerts/hooks/useMarkAlertsRead'
 import { useSavingsGoals } from '@/features/savings/hooks/useSavingsGoals'
 import { useTransactions } from '@/features/transactions/hooks/useTransactions'
-import { getCategoryIcon } from '@/lib/constants'
 import { formatCurrency } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -32,67 +33,72 @@ export function RightPanelContent({ budgetId }: Props) {
     : []
 
   return (
-    <div className="flex flex-col gap-6 overflow-auto p-5">
+    <div className="flex flex-col overflow-y-auto p-4">
       {/* Alertes */}
       <section>
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <p className="text-sm font-medium">Alertes</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">Alertes</p>
             {unread.length > 0 && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
                 {unread.length}
               </span>
             )}
           </div>
           {unread.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 text-xs"
+            <button
+              type="button"
+              className="text-xs text-indigo-600 hover:underline"
               onClick={() => markRead.mutate()}
             >
-              Tout lire
-            </Button>
+              Tout marquer comme lu
+            </button>
           )}
         </div>
 
         {alertsPending ? (
           <div className="space-y-2">
-            {Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-lg" />)}
+            {Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-10 rounded-lg" />)}
           </div>
         ) : unread.length === 0 ? (
-          <div className="flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2.5 dark:bg-emerald-900/10">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-            <p className="text-xs text-emerald-700">Tout est en ordre</p>
+          <div className="flex flex-col items-center gap-1 py-4">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+            </div>
+            <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200">Tout est en ordre</span>
+            <span className="text-xs text-neutral-400">Aucune alerte ce mois</span>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="max-h-48 space-y-1.5 overflow-y-auto">
             {unread.slice(0, 5).map((alert) => (
-              <div
-                key={alert.id}
-                className={cn(
-                  'rounded-lg px-3 py-2.5',
-                  alert.level === 'critical'
-                    ? 'bg-red-50 dark:bg-red-900/10'
-                    : 'bg-amber-50 dark:bg-amber-900/10',
-                )}
-              >
-                <p className={cn('text-xs font-medium', alert.level === 'critical' ? 'text-red-700' : 'text-amber-700')}>
-                  {alert.message}
-                </p>
+              <div key={alert.id} className="flex items-start gap-2 py-1">
+                <span
+                  className={cn(
+                    'mt-1.5 h-2 w-2 shrink-0 rounded-full',
+                    alert.level === 'critical' ? 'bg-red-500' : 'bg-amber-400',
+                  )}
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs leading-snug">{alert.message}</p>
+                  <p className="text-[10px] text-neutral-400">
+                    {alert.created_at && formatDistanceToNow(new Date(alert.created_at), { addSuffix: true, locale: fr })}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
         )}
       </section>
 
+      <Separator className="my-3" />
+
       {/* Récurrentes */}
       <section>
-        <p className="mb-3 text-sm font-medium">Ce mois-ci</p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">Récurrentes ce mois</p>
         {!recurring || recurring.length === 0 ? (
-          <p className="text-xs text-neutral-400">Aucune charge récurrente</p>
+          <p className="py-2 text-xs text-neutral-400">Aucune charge récurrente</p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {recurring.slice(0, 5).map((t) => (
               <div key={t.id} className="flex items-center gap-2">
                 <RefreshCw className="h-3.5 w-3.5 shrink-0 text-neutral-400" />
@@ -104,10 +110,12 @@ export function RightPanelContent({ budgetId }: Props) {
         )}
       </section>
 
+      <Separator className="my-3" />
+
       {/* Objectifs épargne */}
       <section>
-        <div className="mb-3 flex items-center justify-between">
-          <p className="text-sm font-medium">Objectifs épargne</p>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">Objectifs épargne</p>
           {goals && goals.length > 0 && (
             <Link to="/epargne" className="text-xs text-indigo-500 hover:underline">
               Voir tout
@@ -115,10 +123,11 @@ export function RightPanelContent({ budgetId }: Props) {
           )}
         </div>
         {!goals || goals.length === 0 ? (
-          <div className="flex flex-col items-start gap-1">
-            <p className="text-xs text-neutral-400">Aucun objectif</p>
-            <Link to="/epargne" className="text-xs text-indigo-500 hover:underline">
-              Créer un objectif
+          <div className="flex items-center gap-2 py-2">
+            <PiggyBank className="h-3.5 w-3.5 text-neutral-300" />
+            <span className="text-xs text-neutral-400">Aucun objectif</span>
+            <Link to="/epargne" className="ml-auto text-xs text-indigo-500 underline">
+              Créer
             </Link>
           </div>
         ) : (
@@ -127,25 +136,18 @@ export function RightPanelContent({ budgetId }: Props) {
               const pct = goal.target_amount > 0
                 ? Math.min(((goal.current_amount ?? 0) / goal.target_amount) * 100, 100)
                 : 0
-              const Icon = getCategoryIcon(goal.icon ?? 'piggy-bank')
               return (
                 <div key={goal.id}>
-                  <div className="mb-1 flex items-center gap-2">
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30">
-                      <Icon className="h-3 w-3 text-indigo-600" />
-                    </div>
+                  <div className="mb-1 flex items-center gap-1.5">
                     <span className="flex-1 truncate text-xs font-medium">{goal.name}</span>
-                    <span className="text-xs text-neutral-400">{Math.round(pct)}%</span>
+                    <span className="text-[10px] text-neutral-400">{Math.round(pct)}%</span>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-neutral-100">
+                  <div className="h-1.5 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
                     <div
                       className="h-full rounded-full bg-[#6366f1] transition-all"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <p className="mt-0.5 text-right text-[10px] text-neutral-400">
-                    {formatCurrency(goal.current_amount ?? 0)} / {formatCurrency(goal.target_amount)}
-                  </p>
                 </div>
               )
             })}

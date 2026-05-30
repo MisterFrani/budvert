@@ -13,6 +13,7 @@ import { AddCategoryDialog } from '@/features/categories/components/AddCategoryD
 import { EditCategoryDialog } from '@/features/categories/components/EditCategoryDialog'
 import { useCategories } from '@/features/categories/hooks/useCategories'
 import { DataSettings } from '@/features/settings/components/DataSettings'
+import { ProfileSettings } from '@/features/settings/components/ProfileSettings'
 import { getCategoryIcon } from '@/lib/constants'
 import type { Tables } from '@/types/database'
 
@@ -59,7 +60,7 @@ export default function SettingsPage() {
         </TabsList>
 
         <TabsContent value="profil">
-          <ComingSoonTab />
+          <ProfileSettings />
         </TabsContent>
 
         <TabsContent value="budgets">

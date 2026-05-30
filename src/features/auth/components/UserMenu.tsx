@@ -1,10 +1,13 @@
-import { LogOut, User } from 'lucide-react'
+import type { DropdownMenuContentProps } from '@radix-ui/react-dropdown-menu'
+import { LogOut, Settings } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
@@ -21,9 +24,15 @@ function getInitials(name: string | null | undefined, email: string): string {
   return email.slice(0, 2).toUpperCase()
 }
 
-export function UserMenu() {
+type Props = {
+  side?: DropdownMenuContentProps['side']
+  align?: DropdownMenuContentProps['align']
+}
+
+export function UserMenu({ side = 'top', align = 'start' }: Props) {
   const { user, signOut } = useAuth()
   const { data: profile } = useCurrentProfile()
+  const navigate = useNavigate()
 
   if (!user) return null
 
@@ -35,8 +44,11 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-[#f5f5f5] dark:hover:bg-[#262626]">
-          <Avatar className="h-7 w-7 shrink-0">
+        <button
+          type="button"
+          className="rounded-full ring-offset-1 transition-all hover:ring-2 hover:ring-neutral-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-200 dark:hover:ring-neutral-700"
+        >
+          <Avatar className="h-8 w-8">
             <AvatarFallback
               className="text-xs font-semibold text-white"
               style={{ backgroundColor: avatarColor }}
@@ -44,19 +56,31 @@ export function UserMenu() {
               {initials}
             </AvatarFallback>
           </Avatar>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium leading-none">{displayName}</p>
-            <p className="mt-0.5 truncate text-xs text-neutral-500">{email}</p>
-          </div>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuItem className="gap-2">
-          <User className="h-4 w-4" />
-          Mon profil
-        </DropdownMenuItem>
+
+      <DropdownMenuContent side={side} align={align} className="min-w-56" sideOffset={8}>
+        <DropdownMenuLabel className="bg-neutral-50 px-4 py-3 dark:bg-neutral-900">
+          <p className="text-sm font-semibold leading-none">{displayName}</p>
+          <p className="mt-1 text-sm font-normal text-neutral-500 dark:text-neutral-400">{email}</p>
+        </DropdownMenuLabel>
+
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="gap-2 text-red-500 focus:text-red-500" onClick={signOut}>
+
+        <DropdownMenuItem
+          className="gap-2 px-4 py-2 cursor-pointer"
+          onClick={() => navigate('/parametres')}
+        >
+          <Settings className="h-4 w-4" />
+          Paramètres
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          className="gap-2 px-4 py-2 cursor-pointer text-red-500 focus:bg-red-50 focus:text-red-500 dark:focus:bg-red-900/10"
+          onClick={signOut}
+        >
           <LogOut className="h-4 w-4" />
           Se déconnecter
         </DropdownMenuItem>

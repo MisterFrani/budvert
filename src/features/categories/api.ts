@@ -41,3 +41,17 @@ export async function deleteCategory(id: string) {
 
   if (error) throw new Error(error.message)
 }
+
+export async function renameLegacyCategories(budgetId: string) {
+  const renames = [
+    { from: 'Alimentation', to: 'Courses' },
+    { from: 'Loisirs', to: 'Sorties' },
+  ]
+  for (const { from, to } of renames) {
+    await supabase
+      .from('categories')
+      .update({ name: to })
+      .eq('budget_id', budgetId)
+      .eq('name', from)
+  }
+}

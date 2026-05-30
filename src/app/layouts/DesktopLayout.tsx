@@ -3,7 +3,6 @@ import {
   CreditCard,
   LayoutDashboard,
   PiggyBank,
-  Settings,
   Users,
   Wallet,
 } from 'lucide-react'
@@ -59,22 +58,8 @@ function LayoutInner() {
           ))}
         </nav>
 
-        <div className="space-y-0.5 border-t border-[#e5e5e5] p-3 dark:border-[#262626]">
-          <UserMenu />
-          <NavLink
-            to="/parametres"
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-[#6366f1]/10 text-[#6366f1]'
-                  : 'text-[#737373] hover:bg-[#f5f5f5] hover:text-[#171717] dark:text-[#a3a3a3] dark:hover:bg-[#262626] dark:hover:text-[#fafafa]',
-              )
-            }
-          >
-            <Settings className="h-4 w-4" />
-            Paramètres
-          </NavLink>
+        <div className="border-t border-[#e5e5e5] px-3 py-3 dark:border-[#262626]">
+          <UserMenu side="top" align="start" />
         </div>
       </aside>
 
