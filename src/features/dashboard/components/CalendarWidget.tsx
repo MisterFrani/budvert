@@ -1,5 +1,4 @@
 import {
-  addMonths,
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
@@ -9,11 +8,9 @@ import {
   parseISO,
   startOfMonth,
   startOfWeek,
-  subMonths,
 } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { TransactionRow } from '@/features/transactions/components/TransactionRow'
 import { formatCurrency } from '@/lib/format'
@@ -26,13 +23,17 @@ type Category = Tables<'categories'>
 type Props = {
   transactions: Transaction[] | undefined
   categories: Category[] | undefined
+  month: Date
 }
 
 const DAY_LABELS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 
-export function CalendarWidget({ transactions, categories }: Props) {
-  const [currentMonth, setCurrentMonth] = useState(new Date())
+export function CalendarWidget({ transactions, categories, month }: Props) {
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
+
+  useEffect(() => {
+    setSelectedDay(null)
+  }, [month])
 
   const categoryMap = useMemo(() => {
     const map = new Map<string, Category>()
@@ -52,35 +53,19 @@ export function CalendarWidget({ transactions, categories }: Props) {
   }, [transactions])
 
   const days = useMemo(() => {
-    const start = startOfWeek(startOfMonth(currentMonth), { weekStartsOn: 1 })
-    const end = endOfWeek(endOfMonth(currentMonth), { weekStartsOn: 1 })
+    const start = startOfWeek(startOfMonth(month), { weekStartsOn: 1 })
+    const end = endOfWeek(endOfMonth(month), { weekStartsOn: 1 })
     return eachDayOfInterval({ start, end })
-  }, [currentMonth])
+  }, [month])
 
   const selectedDayTransactions = selectedDay ? dailyMap.get(selectedDay)?.transactions ?? [] : []
 
   return (
     <div className="rounded-xl border border-neutral-200 bg-white dark:border-[#262626] dark:bg-[#171717]">
-      <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-4 dark:border-[#262626]">
-        <button
-          type="button"
-          aria-label="Mois précédent"
-          onClick={() => setCurrentMonth((m) => subMonths(m, 1))}
-          className="rounded-lg p-1 hover:bg-neutral-100"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
+      <div className="border-b border-neutral-100 px-5 py-4 dark:border-[#262626]">
         <p className="text-sm font-medium capitalize">
-          {format(currentMonth, 'MMMM yyyy', { locale: fr })}
+          {format(month, 'MMMM yyyy', { locale: fr })}
         </p>
-        <button
-          type="button"
-          aria-label="Mois suivant"
-          onClick={() => setCurrentMonth((m) => addMonths(m, 1))}
-          className="rounded-lg p-1 hover:bg-neutral-100"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
       </div>
 
       <div className="p-4">
@@ -94,13 +79,14 @@ export function CalendarWidget({ transactions, categories }: Props) {
           {days.map((day) => {
             const key = format(day, 'yyyy-MM-dd')
             const daily = dailyMap.get(key)
-            const inMonth = isSameMonth(day, currentMonth)
+            const inMonth = isSameMonth(day, month)
             const isSelected = selectedDay === key
             const today = isToday(day)
 
             return (
               <button
                 key={key}
+                type="button"
                 onClick={() => setSelectedDay(isSelected ? null : key)}
                 disabled={!daily}
                 className={cn(

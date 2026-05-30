@@ -45,16 +45,22 @@ export async function deleteSavingsGoal(id: string) {
 
 export async function addContribution(
   goalId: string,
+  goalName: string,
+  budgetId: string,
   amount: number,
   note?: string,
   date?: string,
 ) {
-  const { error: contribError } = await supabase.from('savings_contributions').insert({
-    goal_id: goalId,
-    amount,
-    note: note ?? null,
-    date: date ?? new Date().toISOString().split('T')[0],
-  })
+  const today = date ?? new Date().toISOString().split('T')[0]
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const { data: contribution, error: contribError } = await supabase
+    .from('savings_contributions')
+    .insert({ goal_id: goalId, amount, note: note ?? null, date: today })
+    .select()
+    .single()
   if (contribError) throw new Error(contribError.message)
 
   const { data: goal, error: fetchError } = await supabase
@@ -69,4 +75,16 @@ export async function addContribution(
     .update({ current_amount: (goal.current_amount ?? 0) + amount })
     .eq('id', goalId)
   if (updateError) throw new Error(updateError.message)
+
+  const { error: txError } = await supabase.from('transactions').insert({
+    type: 'expense',
+    amount,
+    description: `Virement épargne — ${goalName}`,
+    date: today,
+    category_id: null,
+    savings_contribution_id: contribution.id,
+    created_by: user.id,
+    budget_id: budgetId,
+  })
+  if (txError) throw new Error(txError.message)
 }

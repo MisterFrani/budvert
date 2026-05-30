@@ -6,6 +6,7 @@ import { formatCurrency } from '@/lib/format'
 
 type Vars = {
   debtId: string
+  creditor: string
   budgetId: string
   monthlyPayment: number
   currentPaidAmount: number
@@ -16,9 +17,12 @@ export function usePayInstallment() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ debtId, monthlyPayment }: Vars) => payInstallment(debtId, monthlyPayment),
+    mutationFn: ({ debtId, creditor, budgetId, monthlyPayment }: Vars) =>
+      payInstallment(debtId, creditor, budgetId, monthlyPayment),
     onSuccess: (_data, { budgetId, monthlyPayment, currentPaidAmount, totalAmount }) => {
       queryClient.invalidateQueries({ queryKey: ['debts', budgetId] })
+      queryClient.invalidateQueries({ queryKey: ['transactions', budgetId] })
+      queryClient.invalidateQueries({ queryKey: ['summary', budgetId] })
       const newPaid = currentPaidAmount + monthlyPayment
       const settled = newPaid >= totalAmount
       if (settled) {

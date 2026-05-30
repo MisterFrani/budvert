@@ -292,6 +292,7 @@ function DebtCard({ debt, budgetId, onEdit, onDelete }: DebtCardProps) {
           if (!settled) {
             payInstallment.mutate({
               debtId: debt.id,
+              creditor: debt.creditor,
               budgetId,
               monthlyPayment: debt.monthly_payment,
               currentPaidAmount: paid,

@@ -11,6 +11,9 @@ import { CategoryCard, CategoryCardSkeleton } from '@/features/categories/compon
 import { EditCategoryDialog } from '@/features/categories/components/EditCategoryDialog'
 import { useCategories } from '@/features/categories/hooks/useCategories'
 import { useTransactions } from '@/features/transactions/hooks/useTransactions'
+import { formatCurrency } from '@/lib/format'
+import { getProgressColor } from '@/lib/constants'
+import { cn } from '@/lib/utils'
 import { useQueryClient } from '@tanstack/react-query'
 import type { Tables } from '@/types/database'
 
@@ -21,7 +24,7 @@ export default function BudgetPage() {
   const { data: categories, isPending: catPending } = useCategories(activeBudgetId)
   const startDate = format(startOfMonth(new Date()), 'yyyy-MM-dd')
   const endDate = format(endOfMonth(new Date()), 'yyyy-MM-dd')
-  const { data: transactions } = useTransactions(activeBudgetId, { startDate, endDate })
+  const { data: transactions } = useTransactions(activeBudgetId, { startDate, endDate, limit: 500 })
 
   const queryClient = useQueryClient()
   const [editTarget, setEditTarget] = useState<Category | null>(null)
@@ -52,6 +55,14 @@ export default function BudgetPage() {
   const fixed = categories?.filter((c) => c.type === 'fixed') ?? []
   const envelopes = categories?.filter((c) => c.type === 'budget') ?? []
 
+  const fixedPlanned = fixed.reduce((s, c) => s + c.amount, 0)
+  const fixedSpent = fixed.reduce((s, c) => s + (spentByCategory.get(c.id) ?? 0), 0)
+  const envelopesPlanned = envelopes.reduce((s, c) => s + c.amount, 0)
+  const envelopesSpent = envelopes.reduce((s, c) => s + (spentByCategory.get(c.id) ?? 0), 0)
+  const totalPlanned = fixedPlanned + envelopesPlanned
+  const totalSpent = fixedSpent + envelopesSpent
+  const totalRatio = totalPlanned > 0 ? totalSpent / totalPlanned : 0
+
   if (catPending) {
     return (
       <div className="p-6 space-y-6">
@@ -79,6 +90,7 @@ export default function BudgetPage() {
           </button>
         </div>
       )}
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Budget</h1>
         <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setAddOpen(true)}>
@@ -87,11 +99,50 @@ export default function BudgetPage() {
         </Button>
       </div>
 
+      {/* Récap globale */}
+      {categories && categories.length > 0 && (
+        <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:border-[#262626] dark:bg-[#171717]">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            Récap du mois
+          </p>
+          <div className="mb-3 grid grid-cols-3 gap-3 text-center">
+            <div>
+              <p className="text-lg font-semibold">{formatCurrency(totalPlanned)}</p>
+              <p className="text-xs text-neutral-400">Prévu</p>
+            </div>
+            <div>
+              <p className={cn('text-lg font-semibold', totalRatio > 0.9 ? 'text-red-500' : totalRatio > 0.7 ? 'text-amber-500' : 'text-neutral-900 dark:text-white')}>
+                {formatCurrency(totalSpent)}
+              </p>
+              <p className="text-xs text-neutral-400">Dépensé</p>
+            </div>
+            <div>
+              <p className={cn('text-lg font-semibold', totalSpent > totalPlanned ? 'text-red-500' : 'text-emerald-600')}>
+                {formatCurrency(totalPlanned - totalSpent)}
+              </p>
+              <p className="text-xs text-neutral-400">Reste</p>
+            </div>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${Math.min(totalRatio * 100, 100)}%`,
+                backgroundColor: getProgressColor(totalRatio * 100),
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {fixed.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-neutral-400">
-            Charges fixes
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              Charges fixes
+            </h2>
+            <GroupTotals spent={fixedSpent} planned={fixedPlanned} />
+          </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {fixed.map((cat) => (
               <CategoryCard
@@ -107,9 +158,12 @@ export default function BudgetPage() {
 
       {envelopes.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-sm font-medium uppercase tracking-wide text-neutral-400">
-            Enveloppes budget
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              Enveloppes budget
+            </h2>
+            <GroupTotals spent={envelopesSpent} planned={envelopesPlanned} />
+          </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {envelopes.map((cat) => (
               <CategoryCard
@@ -147,5 +201,22 @@ export default function BudgetPage() {
         />
       )}
     </div>
+  )
+}
+
+function GroupTotals({ spent, planned }: { spent: number; planned: number }) {
+  const ratio = planned > 0 ? spent / planned : 0
+  const color =
+    ratio > 0.9
+      ? 'text-red-500'
+      : ratio > 0.7
+        ? 'text-amber-500'
+        : 'text-emerald-600'
+
+  return (
+    <p className="text-sm font-medium">
+      <span className={color}>{formatCurrency(spent)}</span>
+      <span className="text-neutral-400"> / {formatCurrency(planned)}</span>
+    </p>
   )
 }

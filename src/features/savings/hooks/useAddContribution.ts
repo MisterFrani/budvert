@@ -17,10 +17,12 @@ export function useAddContribution() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ goalId, amount, note, date }: Vars) =>
-      addContribution(goalId, amount, note, date),
+    mutationFn: ({ goalId, goalName, budgetId, amount, note, date }: Vars) =>
+      addContribution(goalId, goalName, budgetId, amount, note, date),
     onSuccess: (_data, { budgetId, goalName, amount }) => {
       queryClient.invalidateQueries({ queryKey: ['savings-goals', budgetId] })
+      queryClient.invalidateQueries({ queryKey: ['transactions', budgetId] })
+      queryClient.invalidateQueries({ queryKey: ['summary', budgetId] })
       toast.success(`${formatCurrency(amount)} ajoutés à ${goalName}`)
     },
     onError: (error: Error) => {

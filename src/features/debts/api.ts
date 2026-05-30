@@ -43,12 +43,22 @@ export async function deleteDebt(id: string) {
   if (error) throw new Error(error.message)
 }
 
-export async function payInstallment(debtId: string, monthlyPayment: number) {
-  const { error: payError } = await supabase.from('debt_payments').insert({
-    debt_id: debtId,
-    amount: monthlyPayment,
-    date: new Date().toISOString().split('T')[0],
-  })
+export async function payInstallment(
+  debtId: string,
+  creditor: string,
+  budgetId: string,
+  monthlyPayment: number,
+) {
+  const today = new Date().toISOString().split('T')[0]
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const { data: payment, error: payError } = await supabase
+    .from('debt_payments')
+    .insert({ debt_id: debtId, amount: monthlyPayment, date: today })
+    .select()
+    .single()
   if (payError) throw new Error(payError.message)
 
   const { data: debt, error: fetchError } = await supabase
@@ -65,6 +75,18 @@ export async function payInstallment(debtId: string, monthlyPayment: number) {
     .update({ paid_amount: newPaidAmount })
     .eq('id', debtId)
   if (updateError) throw new Error(updateError.message)
+
+  const { error: txError } = await supabase.from('transactions').insert({
+    type: 'expense',
+    amount: monthlyPayment,
+    description: `Remboursement — ${creditor}`,
+    date: today,
+    category_id: null,
+    debt_payment_id: payment.id,
+    created_by: user.id,
+    budget_id: budgetId,
+  })
+  if (txError) throw new Error(txError.message)
 
   return newPaidAmount
 }

@@ -440,12 +440,14 @@ export type Database = {
           created_at: string | null
           created_by: string
           date: string
+          debt_payment_id: string | null
           description: string
           id: string
           is_recurring: boolean | null
           member_id: string | null
           notes: string | null
           recurrence_rule: string | null
+          savings_contribution_id: string | null
           type: string
           updated_at: string | null
         }
@@ -456,12 +458,14 @@ export type Database = {
           created_at?: string | null
           created_by: string
           date?: string
+          debt_payment_id?: string | null
           description: string
           id?: string
           is_recurring?: boolean | null
           member_id?: string | null
           notes?: string | null
           recurrence_rule?: string | null
+          savings_contribution_id?: string | null
           type: string
           updated_at?: string | null
         }
@@ -472,12 +476,14 @@ export type Database = {
           created_at?: string | null
           created_by?: string
           date?: string
+          debt_payment_id?: string | null
           description?: string
           id?: string
           is_recurring?: boolean | null
           member_id?: string | null
           notes?: string | null
           recurrence_rule?: string | null
+          savings_contribution_id?: string | null
           type?: string
           updated_at?: string | null
         }
@@ -504,10 +510,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "transactions_debt_payment_id_fkey"
+            columns: ["debt_payment_id"]
+            isOneToOne: false
+            referencedRelation: "debt_payments"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "transactions_member_id_fkey"
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "budget_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_savings_contribution_id_fkey"
+            columns: ["savings_contribution_id"]
+            isOneToOne: false
+            referencedRelation: "savings_contributions"
             referencedColumns: ["id"]
           },
         ]
@@ -517,6 +537,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_carried_over: {
+        Args: { p_before: string; p_budget_id: string }
+        Returns: number
+      }
+      get_month_totals: {
+        Args: {
+          p_budget_id: string
+          p_month_end: string
+          p_month_start: string
+        }
+        Returns: {
+          expenses: number
+          income: number
+        }[]
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       user_has_budget_access: {
